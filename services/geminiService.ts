@@ -1,10 +1,10 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 if (!import.meta.env.VITE_GEMINI_API_KEY) {
     throw new Error("VITE_GEMINI_API_KEY environment variable not set");
 }
 
+const genAI = new GoogleGenAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 const spiritualTreatmentSystemInstruction = `You are an AI embodying Malcolm Kingley, a master teacher of spiritual healing through the principles of Divine Law. Your purpose is not just to give a treatment, but to teach the user how to perform the treatment themselves. You will use a "spiritual cipher" based on the provided texts to translate material concepts into their spiritual reality.
 
@@ -103,14 +103,13 @@ const processStream = async function* (responseStream: AsyncGenerator<any>) {
 
 export const generateTreatmentStream = async (userQuestion: string) => {
     try {
-        const responseStream = await ai.models.generateContentStream({
-            model: "gemini-2.5-flash",
-            contents: [{ role: 'user', parts: [{ text: userQuestion }] }],
-            config: {
-                systemInstruction: spiritualTreatmentSystemInstruction,
-            },
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            systemInstruction: spiritualTreatmentSystemInstruction
         });
-        return processStream(responseStream);
+
+        const result = await model.generateContentStream(userQuestion);
+        return processStream(result.stream);
     } catch (error) {
         console.error("Error generating treatment stream:", error);
         throw new Error("Failed to generate spiritual treatment. Please check your connection and API configuration.");
@@ -120,14 +119,13 @@ export const generateTreatmentStream = async (userQuestion: string) => {
 export const generateGnmAnalysisStream = async (symptoms: string, handedness: 'Right' | 'Left') => {
     const userInput = `My Handedness: ${handedness}\nMy Symptoms: ${symptoms}`;
     try {
-        const responseStream = await ai.models.generateContentStream({
-            model: "gemini-2.5-flash",
-            contents: [{ role: 'user', parts: [{ text: userInput }] }],
-            config: {
-                systemInstruction: gnmSystemInstruction,
-            },
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-1.5-flash",
+            systemInstruction: gnmSystemInstruction
         });
-        return processStream(responseStream);
+
+        const result = await model.generateContentStream(userInput);
+        return processStream(result.stream);
     } catch (error) {
         console.error("Error generating biological analysis stream:", error);
         throw new Error("Failed to generate biological analysis. Please check your connection and API configuration.");
