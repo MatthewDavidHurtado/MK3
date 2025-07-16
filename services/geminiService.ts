@@ -5,6 +5,7 @@ if (!process.env.GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY environment variable not set");
 }
 
+const ai = new GoogleGenAI(process.env.GEMINI_API_KEY);
 
 const spiritualTreatmentSystemInstruction = `You are an AI embodying Malcolm Kingley, a master teacher of spiritual healing through the principles of Divine Law. Your purpose is not just to give a treatment, but to teach the user how to perform the treatment themselves. You will use a "spiritual cipher" based on the provided texts to translate material concepts into their spiritual reality.
 
